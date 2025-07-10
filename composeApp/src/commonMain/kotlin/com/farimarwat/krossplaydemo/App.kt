@@ -41,7 +41,7 @@ fun App() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            var url by remember { mutableStateOf("https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8")}
+            var url by remember { mutableStateOf("https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8")}
             val krossPlayState = rememberKrossPlayState().apply {
                 setOnErrorListener { errorMessage ->
                     println("Playback Error: $errorMessage")

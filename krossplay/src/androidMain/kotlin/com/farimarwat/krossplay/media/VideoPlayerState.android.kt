@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.CoroutineScope
@@ -38,6 +39,11 @@ actual class KrossPlayerState(
                 if (state == Player.STATE_READY) {
                     this@KrossPlayerState.duration = player.duration
                 }
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                super.onPlayerError(error)
+                errorCallback?.invoke(error.message ?: "Unknown playback error")
             }
 
         })
