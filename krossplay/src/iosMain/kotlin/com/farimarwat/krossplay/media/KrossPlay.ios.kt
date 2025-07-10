@@ -27,6 +27,7 @@ import platform.CoreGraphics.CGRectZero
 import platform.Foundation.NSURL
 import platform.QuartzCore.CATransaction
 import platform.UIKit.NSLayoutConstraint
+import platform.UIKit.UIColor
 import platform.UIKit.UIView
 
 @OptIn(ExperimentalForeignApi::class)
@@ -51,6 +52,7 @@ actual fun KrossMediaPlayer(
                     override fun layoutSubviews() {
                         super.layoutSubviews()
                         playbackLayer.frame = bounds
+                        backgroundColor = UIColor.blackColor
                     }
                 }
                 container.layer.addSublayer(playbackLayer)

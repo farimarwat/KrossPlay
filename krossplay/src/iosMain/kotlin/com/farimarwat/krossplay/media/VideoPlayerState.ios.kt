@@ -27,8 +27,9 @@ import platform.darwin.dispatch_get_main_queue
 
 actual class KrossPlayerState {
 
-    var player:AVPlayer? = null
-    private var timeObserver:Any? = null
+    var player: AVPlayer = AVPlayer() // ✅ Always valid
+
+    private var timeObserver: Any? = null
     actual var isPlaying: Boolean by mutableStateOf(false)
     actual var progress: Float by mutableStateOf(0F)
     actual var duration: Long by mutableStateOf(0L)
@@ -36,78 +37,74 @@ actual class KrossPlayerState {
 
     private var isObserving = false
 
-
     @OptIn(ExperimentalForeignApi::class)
     actual fun loadVideo(url: String) {
         release()
+
         val nsUrl = NSURL.URLWithString(url)
-        nsUrl?.let{nu ->
-            player = AVPlayer(uRL = nu).apply {
-                timeObserver = addPeriodicTimeObserverForInterval(
-                    interval = CMTimeMakeWithSeconds(1.0, preferredTimescale = NSEC_PER_SEC.toInt()),
-                    queue = dispatch_get_main_queue()
-                ) { time ->
-                    isObserving = true
-                    isPlaying = player?.rate != 0f
-                    if(duration == 0L){
-                        player?.currentItem?.let {
-                            val totalDuration = CMTimeGetSeconds(it.duration)
-                            if (totalDuration.isFinite()) {
-                                duration = (totalDuration * 1000).toLong() // Also in milliseconds
-                            }
+        nsUrl?.let { nu ->
+            val item = platform.AVFoundation.AVPlayerItem.playerItemWithURL(URL = nu)
+            player.replaceCurrentItemWithPlayerItem(item)
+
+            timeObserver = player.addPeriodicTimeObserverForInterval(
+                interval = CMTimeMakeWithSeconds(1.0, preferredTimescale = NSEC_PER_SEC.toInt()),
+                queue = dispatch_get_main_queue()
+            ) { time ->
+                isObserving = true
+                isPlaying = player.rate != 0f
+                if (duration == 0L) {
+                    player.currentItem?.let {
+                        val totalDuration = CMTimeGetSeconds(it.duration)
+                        if (totalDuration.isFinite()) {
+                            duration = (totalDuration * 1000).toLong()
                         }
                     }
-                    currentPosition = (CMTimeGetSeconds(time) * 1000).toLong() // In milliseconds
-                    progress = if (duration > 0) currentPosition.toFloat() / duration else 0f
-                    println("Progress: ${progress}")
                 }
+                currentPosition = (CMTimeGetSeconds(time) * 1000).toLong()
+                progress = if (duration > 0) currentPosition.toFloat() / duration else 0f
             }
 
-            player?.play()
+            player.play()
         }
     }
 
     actual fun togglePlay() {
-        if(isPlaying){
-            player?.pause()
+        if (isPlaying) {
+            player.pause()
         } else {
-            player?.play()
+            player.play()
         }
         isPlaying = !isPlaying
     }
 
     @OptIn(ExperimentalForeignApi::class)
     actual fun seekTo(progress: Float) {
-        val targetTimeInSeconds = progress * duration / 1000.0 // duration is in milliseconds, so we divide by 1000
+        val targetTimeInSeconds = progress * duration / 1000.0
         val targetTime = CMTimeMakeWithSeconds(targetTimeInSeconds, preferredTimescale = NSEC_PER_SEC.toInt())
-        player?.seekToTime(targetTime)
+        player.seekToTime(targetTime)
     }
-
 
     actual fun release() {
         if (timeObserver != null && isObserving) {
             (timeObserver as? NSObject)?.let { observer ->
                 try {
-                    player?.removeTimeObserver(observer)
-                    player?.currentItem?.removeObserver(observer, "duration")
+                    player.removeTimeObserver(observer)
+                    player.currentItem?.removeObserver(observer, "duration")
                 } catch (_: Exception) {
-                    // Safely ignore if already removed or invalid
                 }
                 isObserving = false
             }
             timeObserver = null
         }
 
-        player?.replaceCurrentItemWithPlayerItem(null)
-        player = null
+        player.replaceCurrentItemWithPlayerItem(null)
         isPlaying = false
         progress = 0f
         duration = 0L
         currentPosition = 0L
     }
-
-
 }
+
 
 @Composable
 actual fun rememberKrossPlayState(): KrossPlayerState {
