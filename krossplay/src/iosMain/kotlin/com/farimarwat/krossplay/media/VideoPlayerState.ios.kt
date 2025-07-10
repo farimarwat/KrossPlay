@@ -26,6 +26,7 @@ actual class KrossPlayerState {
     actual var progress: Float by mutableStateOf(0F)
     actual var duration: Long by mutableStateOf(0L)
     actual var currentPosition: Long by mutableStateOf(0L)
+    actual var volumeMuted: Boolean by mutableStateOf(false)
 
     private var isObserving = false
 
@@ -89,6 +90,10 @@ actual class KrossPlayerState {
         player.seekToTime(targetTime)
     }
 
+    actual fun setMuted(muted:Boolean){
+        this@KrossPlayerState.volumeMuted = muted
+        player.setMuted(muted)
+    }
     actual fun release() {
         if (timeObserver != null && isObserving) {
             (timeObserver as? NSObject)?.let { observer ->

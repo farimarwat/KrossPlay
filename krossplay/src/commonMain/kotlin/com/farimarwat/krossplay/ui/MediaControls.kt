@@ -16,9 +16,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeMute
+import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.RingVolume
+import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -67,6 +71,31 @@ fun MediaControls(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
+
+                //Volume controls
+                var isMuted by remember { mutableStateOf(false)}
+                IconButton(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(48.dp)
+                        .align(Alignment.TopStart)
+                        .clip(CircleShape)
+                        .background(Color.Black.copy(0.5f)),
+                    onClick = {
+                        isMuted = !isMuted
+                        state.setMuted(isMuted)
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxSize(),
+                        imageVector = if (state.volumeMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeMute,
+                        contentDescription = "Toggle Play",
+                        tint = Color.White
+                    )
+                }
+
                 // Play Button
                 IconButton(
                     modifier = Modifier

@@ -27,6 +27,7 @@ actual class KrossPlayerState(
     actual var progress: Float by mutableStateOf(0f)
     actual var duration: Long by mutableStateOf(0L)
     actual var currentPosition: Long by mutableStateOf(0L)
+    actual var volumeMuted: Boolean by mutableStateOf(false)
     actual var errorCallback: ((String) -> Unit)? = null
 
 
@@ -74,6 +75,10 @@ actual class KrossPlayerState(
         player.seekTo((progress * duration).toLong())
     }
 
+    actual fun setMuted(muted:Boolean){
+        this@KrossPlayerState.volumeMuted = muted
+        player.volume = if (muted) 0f else 1f
+    }
     actual fun release() {
         player.release()
     }

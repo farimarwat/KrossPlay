@@ -60,7 +60,6 @@ actual fun KrossMediaPlayer(
             },
 
             modifier = Modifier.fillMaxSize()
-                .background(Color.Black)
         )
         MediaControls(
             state = playerState,

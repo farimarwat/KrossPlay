@@ -41,13 +41,13 @@ actual fun KrossMediaPlayer(
             },
             update = { playerview ->
                 playerview.player = playerState.player
-            }
+            },
+            modifier = Modifier
+                .fillMaxSize()
         )
         MediaControls(
             state = playerState,
-            onFullScreenClicked = {
-
-            }
+            onFullScreenClicked = onToggleFullScreen
         )
     }
 }
