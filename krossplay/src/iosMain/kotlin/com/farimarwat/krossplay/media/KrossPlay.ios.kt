@@ -27,17 +27,10 @@ import platform.UIKit.UIView
 actual fun KrossMediaPlayer(
     modifier: Modifier,
     playerState: KrossPlayerState,
-    onToggleFullScreen: (Boolean) -> Unit
+    onToggleFullScreen: () -> Unit
 ) {
-    var fullScreen by remember { mutableStateOf(false) }
     Box(
-        modifier = if (fullScreen) {
-            Modifier.fillMaxSize()
-        } else {
-            Modifier
-                .fillMaxWidth()
-                .height(300.dp)
-        }
+        modifier = modifier
     ) {
         val playbackLayer = remember{AVPlayerLayer()}.apply {
             player = playerState.player
@@ -55,19 +48,18 @@ actual fun KrossMediaPlayer(
                 container.layer.addSublayer(playbackLayer)
                 container
             },
-            update = {
-                fullScreen = !fullScreen
-                fullScreen = !fullScreen
+            update = { container ->
+                // Force the layer to update its display
+                playbackLayer.setNeedsDisplay()
+                container.setNeedsLayout()
+                container.layoutIfNeeded()
             },
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Red)
+            modifier = Modifier.fillMaxSize()
         )
         MediaControls(
             state = playerState,
             onFullScreenClicked = {
-                fullScreen = !fullScreen
-                onToggleFullScreen(fullScreen)
+                onToggleFullScreen()
             }
         )
     }

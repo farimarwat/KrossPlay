@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material.icons.Icons
@@ -39,7 +40,7 @@ fun App() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            var url by remember { mutableStateOf("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")}
+            var url by remember { mutableStateOf("https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8")}
             val krossPlayState = rememberKrossPlayState()
             Row(
                 modifier = Modifier
@@ -71,7 +72,9 @@ fun App() {
             }
 
             KrossMediaPlayer(
-                modifier = Modifier,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
                 playerState = krossPlayState
             )
         }

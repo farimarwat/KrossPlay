@@ -7,5 +7,5 @@ import androidx.compose.ui.Modifier
 expect fun KrossMediaPlayer(
     modifier:Modifier,
     playerState: KrossPlayerState,
-    onToggleFullScreen:(fullScreen:Boolean)->Unit = {}
+    onToggleFullScreen:()->Unit = {}
 )

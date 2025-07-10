@@ -34,6 +34,9 @@ actual class KrossPlayerState {
     actual var duration: Long by mutableStateOf(0L)
     actual var currentPosition: Long by mutableStateOf(0L)
 
+    private var isObserving = false
+
+
     @OptIn(ExperimentalForeignApi::class)
     actual fun loadVideo(url: String) {
         release()
@@ -41,10 +44,10 @@ actual class KrossPlayerState {
         nsUrl?.let{nu ->
             player = AVPlayer(uRL = nu).apply {
                 timeObserver = addPeriodicTimeObserverForInterval(
-                    interval = CMTimeMakeWithSeconds(1.0, preferredTimescale = NSEC_PER_SEC.toInt())
-                    ,
+                    interval = CMTimeMakeWithSeconds(1.0, preferredTimescale = NSEC_PER_SEC.toInt()),
                     queue = dispatch_get_main_queue()
                 ) { time ->
+                    isObserving = true
                     isPlaying = player?.rate != 0f
                     if(duration == 0L){
                         player?.currentItem?.let {
@@ -82,7 +85,7 @@ actual class KrossPlayerState {
 
 
     actual fun release() {
-        if (timeObserver != null) {
+        if (timeObserver != null && isObserving) {
             (timeObserver as? NSObject)?.let { observer ->
                 try {
                     player?.removeTimeObserver(observer)
@@ -90,6 +93,7 @@ actual class KrossPlayerState {
                 } catch (_: Exception) {
                     // Safely ignore if already removed or invalid
                 }
+                isObserving = false
             }
             timeObserver = null
         }

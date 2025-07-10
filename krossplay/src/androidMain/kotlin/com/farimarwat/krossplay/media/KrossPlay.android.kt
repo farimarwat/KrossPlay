@@ -22,19 +22,11 @@ import com.farimarwat.krossplay.ui.MediaControls
 actual fun KrossMediaPlayer(
     modifier: Modifier,
     playerState: KrossPlayerState,
-    onToggleFullScreen: (Boolean) -> Unit
+    onToggleFullScreen: () -> Unit
 ) {
-    var fullScreen by remember { mutableStateOf(false) }
+
     Box(
-        modifier = if(fullScreen){
-            Modifier.fillMaxSize()
-        } else {
-            Modifier
-                .fillMaxWidth()
-                .height(300.dp)
-        }
-            .then(modifier
-                .background(Color.Black))
+        modifier = modifier
     ){
         AndroidView(
             factory = { context ->
@@ -54,8 +46,7 @@ actual fun KrossMediaPlayer(
         MediaControls(
             state = playerState,
             onFullScreenClicked = {
-                fullScreen = !fullScreen
-                onToggleFullScreen(fullScreen)
+
             }
         )
     }
