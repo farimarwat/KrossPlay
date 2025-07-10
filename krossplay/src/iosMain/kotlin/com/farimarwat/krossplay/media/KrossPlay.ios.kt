@@ -18,8 +18,12 @@ import com.farimarwat.krossplay.ui.MediaControls
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readValue
 import platform.AVFoundation.AVLayerVideoGravityResizeAspect
+import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerLayer
+import platform.AVKit.AVPlayerViewController
 import platform.CoreGraphics.CGRectZero
+import platform.Foundation.NSURL
+import platform.UIKit.NSLayoutConstraint
 import platform.UIKit.UIView
 
 @OptIn(ExperimentalForeignApi::class)
@@ -32,27 +36,30 @@ actual fun KrossMediaPlayer(
     Box(
         modifier = modifier
     ) {
-        val playbackLayer = remember{AVPlayerLayer()}.apply {
-            player = playerState.player
-            videoGravity = AVLayerVideoGravityResizeAspect
-        }
+
+        val avPlayerViewController = remember { AVPlayerViewController() }
+
+        avPlayerViewController.player = playerState.player
+        avPlayerViewController.showsPlaybackControls = true
+        avPlayerViewController.allowsPictureInPicturePlayback = true
 
         UIKitView(
             factory = {
-                val container = object : UIView(CGRectZero.readValue()) {
-                    override fun layoutSubviews() {
-                        super.layoutSubviews()
-                        playbackLayer.frame = bounds
-                    }
-                }
-                container.layer.addSublayer(playbackLayer)
-                container
-            },
-            update = { container ->
-                // Force the layer to update its display
-                playbackLayer.setNeedsDisplay()
-                container.setNeedsLayout()
-                container.layoutIfNeeded()
+                val playerContainer = UIView()
+
+                avPlayerViewController.view.translatesAutoresizingMaskIntoConstraints = false
+                playerContainer.addSubview(avPlayerViewController.view)
+
+                NSLayoutConstraint.activateConstraints(
+                    listOf(
+                        avPlayerViewController.view.leadingAnchor.constraintEqualToAnchor(playerContainer.leadingAnchor),
+                        avPlayerViewController.view.trailingAnchor.constraintEqualToAnchor(playerContainer.trailingAnchor),
+                        avPlayerViewController.view.topAnchor.constraintEqualToAnchor(playerContainer.topAnchor),
+                        avPlayerViewController.view.bottomAnchor.constraintEqualToAnchor(playerContainer.bottomAnchor)
+                    )
+                )
+
+                playerContainer
             },
             modifier = Modifier.fillMaxSize()
         )
