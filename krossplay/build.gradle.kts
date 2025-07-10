@@ -1,8 +1,11 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    id("com.vanniktech.maven.publish") version "0.33.0"
 }
 
 kotlin {
@@ -109,4 +112,43 @@ kotlin {
         }
     }
 
+    mavenPublishing{
+        coordinates(
+            groupId = "io.github.farimarwat",
+            artifactId = "krossplay",
+            version = "1.0"
+        )
+        pom {
+            name.set("KrossPlay")
+            description.set("A Media Player for Compose Multi Platform(CMP)")
+            inceptionYear.set("2024")
+            url.set("https://github.com/farimarwat/KrossPlay")
+
+            licenses {
+                license {
+                    name.set("MIT")
+                    url.set("https://opensource.org/licenses/MIT")
+                }
+            }
+
+            // Specify developers information
+            developers {
+                developer {
+                    id.set("farimarwat")
+                    name.set("Farman Ullah Khan Marwat")
+                    email.set("farimarwat@gmail.com")
+                }
+            }
+
+            // Specify SCM information
+            scm {
+                url.set("https://github.com/farimarwat/KrossPlay")
+            }
+        }
+
+        publishToMavenCentral()
+
+        // Enable GPG signing for all publications
+        signAllPublications()
+    }
 }
