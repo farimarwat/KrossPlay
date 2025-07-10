@@ -34,6 +34,7 @@ import krossplaydemo.composeapp.generated.resources.compose_multiplatform
 fun App() {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
+        var fullScreen by remember { mutableStateOf(false)}
         Column(
             modifier = Modifier
                 .safeContentPadding()
@@ -72,10 +73,17 @@ fun App() {
             }
 
             KrossMediaPlayer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp),
-                playerState = krossPlayState
+                modifier = if(fullScreen){
+                    Modifier.fillMaxSize()
+                }else{
+                    Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                },
+                playerState = krossPlayState,
+                onToggleFullScreen = {
+                    fullScreen = !fullScreen
+                }
             )
         }
     }

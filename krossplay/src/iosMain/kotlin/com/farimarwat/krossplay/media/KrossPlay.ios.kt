@@ -15,14 +15,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.UIKitView
 import com.farimarwat.krossplay.ui.MediaControls
+import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readValue
 import platform.AVFoundation.AVLayerVideoGravityResizeAspect
 import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerLayer
 import platform.AVKit.AVPlayerViewController
+import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectZero
 import platform.Foundation.NSURL
+import platform.QuartzCore.CATransaction
 import platform.UIKit.NSLayoutConstraint
 import platform.UIKit.UIView
 
@@ -37,31 +40,25 @@ actual fun KrossMediaPlayer(
         modifier = modifier
     ) {
 
-        val avPlayerViewController = remember { AVPlayerViewController() }
-
-        avPlayerViewController.player = playerState.player
-        avPlayerViewController.showsPlaybackControls = true
-        avPlayerViewController.allowsPictureInPicturePlayback = true
+        val playbackLayer = remember{AVPlayerLayer()}.apply {
+            player = playerState.player
+            videoGravity = AVLayerVideoGravityResizeAspect
+        }
 
         UIKitView(
             factory = {
-                val playerContainer = UIView()
-
-                avPlayerViewController.view.translatesAutoresizingMaskIntoConstraints = false
-                playerContainer.addSubview(avPlayerViewController.view)
-
-                NSLayoutConstraint.activateConstraints(
-                    listOf(
-                        avPlayerViewController.view.leadingAnchor.constraintEqualToAnchor(playerContainer.leadingAnchor),
-                        avPlayerViewController.view.trailingAnchor.constraintEqualToAnchor(playerContainer.trailingAnchor),
-                        avPlayerViewController.view.topAnchor.constraintEqualToAnchor(playerContainer.topAnchor),
-                        avPlayerViewController.view.bottomAnchor.constraintEqualToAnchor(playerContainer.bottomAnchor)
-                    )
-                )
-
-                playerContainer
+                val container = object : UIView(CGRectZero.readValue()) {
+                    override fun layoutSubviews() {
+                        super.layoutSubviews()
+                        playbackLayer.frame = bounds
+                    }
+                }
+                container.layer.addSublayer(playbackLayer)
+                container
             },
+
             modifier = Modifier.fillMaxSize()
+                .background(Color.Black)
         )
         MediaControls(
             state = playerState,
