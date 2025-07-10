@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
@@ -59,7 +61,15 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                // Add KMP dependencies here
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.runtimeCompose)
+                implementation(libs.material.icons)
             }
         }
 
@@ -71,9 +81,12 @@ kotlin {
 
         androidMain {
             dependencies {
-                // Add Android-specific dependencies here. Note that this source set depends on
-                // commonMain by default and will correctly pull the Android artifacts of any KMP
-                // dependencies declared in commonMain.
+
+
+                //exoplayer
+                implementation(libs.androidx.media3.exoplayer)
+                implementation(libs.androidx.media3.ui)
+                implementation(libs.androidx.media3.exoplayer.dash)
             }
         }
 

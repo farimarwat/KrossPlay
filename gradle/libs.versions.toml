@@ -16,6 +16,8 @@ kotlin = "2.2.0"
 kotlinStdlib = "2.2.0"
 runner = "1.6.2"
 core = "1.6.1"
+media3Exoplayer = "1.7.1"
+materialIcons = "1.7.3"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -32,6 +34,13 @@ androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
+
+androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3Exoplayer" }
+androidx-media3-exoplayer-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3Exoplayer" }
+androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3Exoplayer" }
+
+material-icons = { module = "org.jetbrains.compose.material:material-icons-extended", version.ref="materialIcons"}
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
