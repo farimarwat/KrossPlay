@@ -7,18 +7,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.cinterop.ExperimentalForeignApi
-import platform.AVFoundation.AVPlayer
-import platform.AVFoundation.addPeriodicTimeObserverForInterval
-import platform.AVFoundation.currentItem
-import platform.AVFoundation.duration
-import platform.AVFoundation.pause
-import platform.AVFoundation.play
-import platform.AVFoundation.rate
-import platform.AVFoundation.removeTimeObserver
-import platform.AVFoundation.replaceCurrentItemWithPlayerItem
-import platform.AVFoundation.seekToTime
+import platform.AVFoundation.*
 import platform.CoreMedia.CMTimeGetSeconds
 import platform.CoreMedia.CMTimeMakeWithSeconds
+import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSURL
 import platform.Foundation.removeObserver
 import platform.darwin.NSEC_PER_SEC
@@ -27,9 +19,9 @@ import platform.darwin.dispatch_get_main_queue
 
 actual class KrossPlayerState {
 
-    var player: AVPlayer = AVPlayer() // ✅ Always valid
-
+    var player: AVPlayer = AVPlayer() // Always reuse the same player
     private var timeObserver: Any? = null
+
     actual var isPlaying: Boolean by mutableStateOf(false)
     actual var progress: Float by mutableStateOf(0F)
     actual var duration: Long by mutableStateOf(0L)
@@ -37,15 +29,28 @@ actual class KrossPlayerState {
 
     private var isObserving = false
 
+    actual var errorCallback: ((String) -> Unit)? = null
+
+
     @OptIn(ExperimentalForeignApi::class)
     actual fun loadVideo(url: String) {
         release()
-
         val nsUrl = NSURL.URLWithString(url)
         nsUrl?.let { nu ->
-            val item = platform.AVFoundation.AVPlayerItem.playerItemWithURL(URL = nu)
+            val item = AVPlayerItem.playerItemWithURL(URL = nu)
+
+            NSNotificationCenter.defaultCenter.addObserverForName(
+                name = AVPlayerItemFailedToPlayToEndTimeNotification,
+                `object` = item,
+                queue = null
+            ) { _ ->
+                val error = item.error?.localizedDescription ?: "Unknown playback error"
+                errorCallback?.invoke(error)
+            }
+
             player.replaceCurrentItemWithPlayerItem(item)
 
+            // ⏱️ Time observer for progress updates
             timeObserver = player.addPeriodicTimeObserverForInterval(
                 interval = CMTimeMakeWithSeconds(1.0, preferredTimescale = NSEC_PER_SEC.toInt()),
                 queue = dispatch_get_main_queue()
@@ -90,7 +95,8 @@ actual class KrossPlayerState {
                 try {
                     player.removeTimeObserver(observer)
                     player.currentItem?.removeObserver(observer, "duration")
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    errorCallback?.invoke("$e")
                 }
                 isObserving = false
             }
@@ -103,8 +109,10 @@ actual class KrossPlayerState {
         duration = 0L
         currentPosition = 0L
     }
+    actual fun setOnErrorListener(callback: (String) -> Unit) {
+        errorCallback = callback
+    }
 }
-
 
 @Composable
 actual fun rememberKrossPlayState(): KrossPlayerState {

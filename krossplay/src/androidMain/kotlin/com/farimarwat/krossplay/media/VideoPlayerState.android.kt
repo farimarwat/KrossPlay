@@ -26,6 +26,7 @@ actual class KrossPlayerState(
     actual var progress: Float by mutableStateOf(0f)
     actual var duration: Long by mutableStateOf(0L)
     actual var currentPosition: Long by mutableStateOf(0L)
+    actual var errorCallback: ((String) -> Unit)? = null
 
 
     init {
@@ -69,6 +70,9 @@ actual class KrossPlayerState(
 
     actual fun release() {
         player.release()
+    }
+    actual fun setOnErrorListener(callback: (String) -> Unit) {
+        errorCallback = callback
     }
 }
 

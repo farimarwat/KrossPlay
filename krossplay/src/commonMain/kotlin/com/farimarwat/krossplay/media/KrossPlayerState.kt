@@ -8,11 +8,14 @@ expect class KrossPlayerState {
     var progress: Float
     var duration: Long
     var currentPosition: Long
+    var errorCallback: ((String) -> Unit)?
 
     fun loadVideo(url: String)
     fun togglePlay()
     fun seekTo(progress: Float)
     fun release()
+
+    fun setOnErrorListener(callback: (String) -> Unit)
 }
 
 @Composable
