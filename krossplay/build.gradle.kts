@@ -117,7 +117,7 @@ kotlin {
         coordinates(
             groupId = "io.github.farimarwat",
             artifactId = "krossplay",
-            version = "1.0"
+            version = "1.1"
         )
         pom {
             name.set("KrossPlay")
